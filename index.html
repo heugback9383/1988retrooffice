@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>안산산업역사관 팝업전시 (1988) - 디지털 아카이브</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts for Retro Style -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Nanum+Myeongjo:wght@400;700;800&family=VT323&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        vintageBg: '#F4EEE1',
+                        vintagePaper: '#E8DFCA',
+                        vintageDark: '#2B2621',
+                        vintageRed: '#A93226',
+                        vintageGreen: '#1E4D2B',
+                        vintageBlue: '#1B4F72',
+                        vintageFolder: '#D4AC0D'
+                    },
+                    fontFamily: {
+                        myeongjo: ['Nanum Myeongjo', 'Gowun Batang', 'serif'],
+                        pixel: ['VT323', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #F4EEE1;
+            color: #2B2621;
+            font-family: 'Nanum Myeongjo', serif;
+            background-image: radial-gradient(#dcd2bd 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+
+        /* CRT Effect */
+        .crt-overlay {
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%);
+            background-size: 100% 4px;
+            pointer-events: none;
+        }
+
+        /* Red Seal Stamp Effect */
+        .stamp-mark {
+            border: 3px solid #A93226;
+            color: #A93226;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transform: rotate(-12deg);
+            opacity: 0.85;
+            mask-image: radial-gradient(circle, rgba(0,0,0,1) 70%, rgba(0,0,0,0.6) 100%);
+            box-shadow: inset 0 0 2px #A93226;
+        }
+
+        .stamp-box {
+            border: 3px double #A93226;
+            color: #A93226;
+            font-weight: bold;
+            transform: rotate(-4deg);
+            display: inline-block;
+            padding: 4px 12px;
+            letter-spacing: 2px;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #E8DFCA;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #8C7A5B;
+            border-radius: 4px;
+        }
+
+        /* Paper Texture Shadow */
+        .paper-shadow {
+            box-shadow: 4px 4px 0px rgba(0,0,0,0.15), 0 10px 20px rgba(0,0,0,0.05);
+        }
+
+        .folder-tab {
+            clip-path: polygon(0 0, 80% 0, 100% 100%, 0% 100%);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between relative selection:bg-amber-200 selection:text-amber-900">
+
+    <!-- CRT Overlay Screen Toggleable -->
+    <div id="crtOverlay" class="crt-overlay fixed inset-0 z-50 opacity-20 pointer-events-none"></div>
+
+    <!-- Retro Header & Navigation Bar -->
+    <header class="border-b-4 border-vintageDark bg-vintagePaper sticky top-0 z-40 shadow-md">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+            
+            <!-- Title & Badge -->
+            <div class="flex items-center space-x-3">
+                <div class="bg-vintageDark text-vintageBg font-pixel text-xl px-2 py-1 rounded">1988.10.18</div>
+                <div>
+                    <h1 class="text-xl md:text-2xl font-black tracking-tight text-vintageDark">
+                        안산산업역사관 <span class="text-sm font-normal text-amber-900 block md:inline">[1988 레트로 오피스] 디지털 아카이브</span>
+                    </h1>
+                </div>
+            </div>
+
+            <!-- BGM Cassette Player Controls -->
+            <div class="flex items-center bg-[#D8CBB5] border-2 border-vintageDark rounded-lg px-3 py-1.5 shadow-inner space-x-3">
+                <div class="flex items-center space-x-2 text-xs font-bold text-vintageDark">
+                    <i class="fa-solid font-pixel text-base fa-tape text-amber-800 animate-pulse" id="tapeIcon"></i>
+                    <span id="bgmTitle" class="hidden sm:inline">8090 Office BGM (Lo-Fi)</span>
+                </div>
+                <button onclick="toggleAudio()" id="playBtn" class="bg-vintageDark hover:bg-amber-900 text-vintageBg text-xs px-3 py-1 rounded flex items-center gap-1 transition">
+                    <i class="fa-solid fa-play" id="playIcon"></i> <span id="playText">재생</span>
+                </button>
+                <button onclick="toggleCRT()" class="bg-amber-800 hover:bg-amber-900 text-white text-xs px-2 py-1 rounded" title="CRT 모니터 효과 토글">
+                    CRT
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-6xl mx-auto px-4 py-8 flex-grow w-full space-y-12">
+
+        <!-- HERO SECTION: Corporate Motto (사훈) -->
+        <section class="text-center relative">
+            <div class="bg-vintagePaper border-4 border-vintageDark p-6 md:p-10 rounded-lg paper-shadow relative overflow-hidden max-w-3xl mx-auto">
+                <div class="absolute -right-6 -bottom-6 opacity-10 pointer-events-none">
+                    <i class="fa-solid fa-building text-9xl"></i>
+                </div>
+                <div class="border-2 border-vintageDark p-4 md:p-8 border-dashed">
+                    <span class="text-sm font-bold tracking-widest text-amber-900 bg-amber-100 px-3 py-1 border border-amber-800 rounded">[ 사 훈 ]</span>
+                    <h2 class="text-3xl md:text-5xl font-extrabold mt-4 mb-2 tracking-wide text-vintageDark">
+                        정확한 서류 작성<br>
+                        <span class="text-vintageRed">신속한 결재 승인</span>
+                    </h2>
+                    <p class="text-xs md:text-sm text-stone-600 font-bold mt-4">
+                        일합협동(日合協同) 1988 ★ (주)반월공업단지 기획실
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ZONE EXHIBITION NAV TABS -->
+        <section class="space-y-6">
+            <div class="flex items-center justify-between border-b-2 border-vintageDark pb-2">
+                <h3 class="text-xl md:text-2xl font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-folder-open text-vintageFolder"></i> 전시 구역별 살펴보기 (Zone)
+                </h3>
+                <span class="text-xs text-stone-600">* 각 영역을 클릭하여 현장을 확인하세요</span>
+            </div>
+
+            <!-- Tab Buttons -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <button onclick="switchZone(1)" id="tab-1" class="zone-tab bg-amber-200 border-2 border-vintageDark p-4 text-left rounded-lg font-bold hover:bg-amber-300 transition flex items-center justify-between">
+                    <span>ZONE 1: 안내부스 & 출근도장</span>
+                    <i class="fa-solid fa-chevron-right text-xs"></i>
+                </button>
+                <button onclick="switchZone(2)" id="tab-2" class="zone-tab bg-vintagePaper border-2 border-vintageDark p-4 text-left rounded-lg font-bold hover:bg-amber-300 transition flex items-center justify-between">
+                    <span>ZONE 2: 타임머신 통로</span>
+                    <i class="fa-solid fa-chevron-right text-xs"></i>
+                </button>
+                <button onclick="switchZone(3)" id="tab-3" class="zone-tab bg-vintagePaper border-2 border-vintageDark p-4 text-left rounded-lg font-bold hover:bg-amber-300 transition flex items-center justify-between">
+                    <span>ZONE 3: 1988 레트로 오피스</span>
+                    <i class="fa-solid fa-chevron-right text-xs"></i>
+                </button>
+            </div>
+
+            <!-- Tab Content Panels -->
+            <div class="bg-vintagePaper border-2 border-vintageDark p-6 rounded-lg paper-shadow min-h-[250px]">
+                
+                <!-- ZONE 1 -->
+                <div id="zone-content-1" class="zone-panel space-y-4">
+                    <div class="flex flex-col md:flex-row gap-6 items-center">
+                        <div class="w-full md:w-1/2 space-y-3">
+                            <span class="bg-amber-800 text-white text-xs px-2.5 py-1 rounded font-bold">입구 / 출근존</span>
+                            <h4 class="text-2xl font-bold text-vintageDark">월급명세서 봉투 & 미션지 수령</h4>
+                            <p class="text-sm leading-relaxed text-stone-700">
+                                전시장에 입장하는 관람객은 1988년 반월공단 신입사원으로 입사하게 됩니다. 출근 도장을 직접 찍고 노란 월급봉투와 업무 미션지를 받아 팝업 탐험을 시작합니다.
+                            </p>
+                            <div class="flex gap-2 text-xs font-bold text-amber-900">
+                                <span class="bg-amber-100 border border-amber-300 px-2 py-1 rounded">#월급봉투</span>
+                                <span class="bg-amber-100 border border-amber-300 px-2 py-1 rounded">#출근부도장</span>
+                                <span class="bg-amber-100 border border-amber-300 px-2 py-1 rounded">#신입사원</span>
+                            </div>
+                        </div>
+                        <div class="w-full md:w-1/2 bg-amber-100 border-2 border-dashed border-vintageDark p-6 rounded text-center">
+                            <i class="fa-solid fa-envelope-open-text text-5xl text-amber-800 mb-2"></i>
+                            <p class="font-bold text-sm">노란 월급명세서 봉투 굿즈</p>
+                            <p class="text-xs text-stone-600 mt-1">하단 '1988 월급명세서 발급기'에서 체험 가능</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ZONE 2 -->
+                <div id="zone-content-2" class="zone-panel hidden space-y-4">
+                    <div class="flex flex-col md:flex-row gap-6 items-center">
+                        <div class="w-full md:w-1/2 space-y-3">
+                            <span class="bg-vintageRed text-white text-xs px-2.5 py-1 rounded font-bold">전시 통로 / 아카이브</span>
+                            <h4 class="text-2xl font-bold text-vintageDark">1980년대 안산 반월공단 신문 스크랩 & 포스터 벽면</h4>
+                            <p class="text-sm leading-relaxed text-stone-700">
+                                80년대 산업 발전의 중심이었던 안산 반월공단의 옛 신문기사, 공장 안전 수칙 표어("닦고 조이고 기름치자"), 빈티지 기업 광고 스크랩 벽면을 따라 걸으며 안산의 역사적 배경을 익힙니다.
+                            </p>
+                            <div class="flex gap-2 text-xs font-bold text-amber-900">
+                                <span class="bg-amber-100 border border-amber-300 px-2 py-1 rounded">#반월공업단지</span>
+                                <span class="bg-amber-100 border border-amber-300 px-2 py-1 rounded">#안전제일</span>
+                                <span class="bg-amber-100 border border-amber-300 px-2 py-1 rounded">#80년대광고</span>
+                            </div>
+                        </div>
+                        <div class="w-full md:w-1/2 bg-stone-200 border-2 border-vintageDark p-4 rounded space-y-2">
+                            <div class="bg-white p-3 border border-stone-400 text-xs space-y-1">
+                                <p class="font-bold text-red-700">[안전 표어] 닦고 조이고 기름치자!</p>
+                                <p class="text-stone-600">수출 100억 불 달성을 향한 반월공단 전사의 맹세 (1988)</p>
+                            </div>
+                            <div class="bg-white p-3 border border-stone-400 text-xs space-y-1">
+                                <p class="font-bold text-blue-900">[신문기사] 서해안 시대의 중심, 안산시 승격 레트로 뉴스</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ZONE 3 -->
+                <div id="zone-content-3" class="zone-panel hidden space-y-4">
+                    <div class="flex flex-col md:flex-row gap-6 items-center">
+                        <div class="w-full md:w-1/2 space-y-3">
+                            <span class="bg-vintageGreen text-white text-xs px-2.5 py-1 rounded font-bold">메인 연출존 / 레트로 오피스</span>
+                            <h4 class="text-2xl font-bold text-vintageDark">1988 행정 사무실 재현 공간</h4>
+                            <p class="text-sm leading-relaxed text-stone-700">
+                                초록색 데스크 매트, 카키색 서류철, 레버아치 바인더, 유선 전화기, 쌀알 계산기 등이 비치된 책상에서 직접 결재 서류를 열어 미션 정답([중화학], [1988])을 찾고 승인 도장을 찍어보는 체험 구역입니다.
+                            </p>
+                            <div class="flex gap-2 text-xs font-bold text-amber-900">
+                                <span class="bg-amber-100 border border-amber-300 px-2 py-1 rounded">#초록데스크매트</span>
+                                <span class="bg-amber-100 border border-amber-300 px-2 py-1 rounded">#결재승인</span>
+                                <span class="bg-amber-100 border border-amber-300 px-2 py-1 rounded">#레버아치바인더</span>
+                            </div>
+                        </div>
+                        <div class="w-full md:w-1/2 bg-[#1E4D2B] p-4 rounded text-white border-2 border-vintageDark shadow-inner flex flex-col justify-between h-40">
+                            <div class="flex justify-between items-start">
+                                <span class="text-xs bg-amber-400 text-black font-bold px-2 py-0.5 rounded">기획실 책상 매트</span>
+                                <div class="stamp-box text-xs bg-white bg-opacity-90 px-2 py-1">승인 1988</div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-xs text-amber-200">노란/파란 결재 서류철 수신 완료</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- INTERACTIVE SECTION 1: MISSION FOLDER VIEWER -->
+        <section class="space-y-4">
+            <h3 class="text-xl md:text-2xl font-bold flex items-center gap-2">
+                <i class="fa-solid fa-folder-closed text-amber-800"></i> 미션 서류철 열람 (Interactive Folder)
+            </h3>
+            <p class="text-xs text-stone-600">서류철을 클릭하여 1988년도 기획실 미션지 내용을 확인하세요.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Yellow Folder -->
+                <div class="bg-[#F39C12] p-1 rounded-t-lg border-2 border-vintageDark shadow-md">
+                    <div class="bg-amber-100 p-2 font-bold text-xs border-b border-vintageDark flex justify-between">
+                        <span>[노란 서류철] 미션 01 - 산업 단지</span>
+                        <span class="text-amber-900">SECRET</span>
+                    </div>
+                    <div class="bg-vintageBg p-6 space-y-3 min-h-[160px]">
+                        <p class="text-xs font-bold text-stone-600">Q. 1980년대 안산 반월공단이 주력으로 육성하던 핵심 공업 분야는?</p>
+                        <button onclick="revealMission(1)" class="bg-vintageDark text-vintageBg text-xs px-3 py-1.5 rounded font-bold hover:bg-amber-900 transition">
+                            답안 문서 열기
+                        </button>
+                        <div id="mission-ans-1" class="hidden mt-3 p-3 bg-amber-200 border border-amber-800 rounded text-sm font-bold text-vintageRed">
+                            정답: [ 중 화 학 ] 공업단지
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Blue Folder -->
+                <div class="bg-[#2980B9] p-1 rounded-t-lg border-2 border-vintageDark shadow-md">
+                    <div class="bg-blue-100 p-2 font-bold text-xs border-b border-vintageDark flex justify-between">
+                        <span>[파란 서류철] 미션 02 - 역사적 연도</span>
+                        <span class="text-blue-900">CONFIDENTIAL</span>
+                    </div>
+                    <div class="bg-vintageBg p-6 space-y-3 min-h-[160px]">
+                        <p class="text-xs font-bold text-stone-600">Q. 안산시 승격 및 반월공단 활성화의 기점이 된 레트로 오피스의 기준 연도는?</p>
+                        <button onclick="revealMission(2)" class="bg-vintageDark text-vintageBg text-xs px-3 py-1.5 rounded font-bold hover:bg-amber-900 transition">
+                            답안 문서 열기
+                        </button>
+                        <div id="mission-ans-2" class="hidden mt-3 p-3 bg-blue-200 border border-blue-800 rounded text-sm font-bold text-vintageBlue">
+                            정답: [ 1988 ] 년
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- INTERACTIVE SECTION 2: 1988 SALARY CERTIFICATE GENERATOR -->
+        <section class="space-y-4">
+            <h3 class="text-xl md:text-2xl font-bold flex items-center gap-2">
+                <i class="fa-solid fa-file-invoice-dollar text-amber-900"></i> 1988년 월분 급여명세서 발급기
+            </h3>
+            
+            <div class="bg-vintagePaper border-4 border-vintageDark p-6 rounded-lg paper-shadow max-w-2xl mx-auto space-y-6">
+                <!-- Input Controls -->
+                <div class="flex flex-col sm:flex-row gap-3 items-center justify-between border-b-2 border-vintageDark pb-4">
+                    <label for="employeeName" class="font-bold text-sm text-vintageDark">사원 성명 입력:</label>
+                    <div class="flex gap-2 w-full sm:w-auto">
+                        <input type="text" id="employeeName" placeholder="예: 홍길동" value="김안산" class="border-2 border-vintageDark p-2 rounded text-sm bg-white font-bold text-vintageDark focus:outline-none focus:ring-2 focus:ring-amber-800 w-full">
+                        <button onclick="generateSalarySlip()" class="bg-vintageRed hover:bg-red-900 text-white font-bold text-xs px-4 py-2 rounded whitespace-nowrap shadow transition">
+                            명세서 정산
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Printable Salary Certificate Output -->
+                <div id="salarySlipCard" class="bg-[#FAF4E8] border-2 border-vintageDark p-6 rounded shadow-inner relative space-y-4">
+                    <!-- Stamp Mark Overlay -->
+                    <div class="absolute right-6 top-16 stamp-mark w-20 h-20 text-xs text-center flex flex-col justify-center leading-tight">
+                        <span>직인</span>
+                        <span class="text-[10px] font-bold">반월공단</span>
+                    </div>
+
+                    <div class="text-center border-b-2 border-vintageDark pb-2">
+                        <h4 class="text-2xl font-black tracking-widest text-vintageDark">월분 급여명세서</h4>
+                        <p class="text-xs text-stone-600 font-bold mt-1">1988년 10월 귀하</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 text-xs font-bold">
+                        <div>
+                            <span class="text-stone-500 block">부서:</span>
+                            <span class="text-sm">안산 기획실</span>
+                        </div>
+                        <div>
+                            <span class="text-stone-500 block">성명:</span>
+                            <span id="slipName" class="text-sm text-vintageRed">김안산 사원</span>
+                        </div>
+                    </div>
+
+                    <table class="w-full text-xs border-collapse border border-vintageDark text-center">
+                        <thead>
+                            <tr class="bg-amber-200 border-b border-vintageDark">
+                                <th class="border border-vintageDark p-1.5">지급 항목</th>
+                                <th class="border border-vintageDark p-1.5">금액</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="border border-vintageDark p-1.5">기본급 (본봉)</td>
+                                <td class="border border-vintageDark p-1.5 text-right font-pixel text-sm">350,000 원</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-vintageDark p-1.5">미션 완수 수당</td>
+                                <td class="border border-vintageDark p-1.5 text-right font-pixel text-sm">50,000 원</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-vintageDark p-1.5">추억 상여금</td>
+                                <td class="border border-vintageDark p-1.5 text-right font-pixel text-sm">100,000 원</td>
+                            </tr>
+                            <tr class="bg-amber-100 font-bold">
+                                <td class="border border-vintageDark p-1.5 text-vintageRed">실수령액</td>
+                                <td class="border border-vintageDark p-1.5 text-right font-pixel text-base text-vintageRed">500,000 원</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="text-right text-[11px] text-stone-600 pt-2">
+                        (주) 반월공업단지 대표이사 (인)
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button onclick="copyCertificate()" class="text-xs font-bold bg-vintageDark text-vintageBg px-4 py-2 rounded hover:bg-amber-900 transition">
+                        <i class="fa-solid fa-copy mr-1"></i> 명세서 문구 복사하기
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- INTERACTIVE SECTION 3: VIRTUAL GUESTBOOK -->
+        <section class="space-y-4">
+            <h3 class="text-xl md:text-2xl font-bold flex items-center gap-2">
+                <i class="fa-solid fa-pen-nib text-vintageDark"></i> 1988년 신입사원 방명록 (Guestbook)
+            </h3>
+
+            <div class="bg-vintagePaper border-2 border-vintageDark p-6 rounded-lg paper-shadow space-y-6">
+                <!-- Guestbook Form -->
+                <form id="guestbookForm" onsubmit="addGuestbookEntry(event)" class="space-y-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <input type="text" id="gbName" placeholder="사원 이름" required class="border-2 border-vintageDark p-2 text-xs rounded bg-white font-bold">
+                        <input type="text" id="gbDept" placeholder="소속 부서 (예: 생산과, 총무부)" required class="border-2 border-vintageDark p-2 text-xs rounded bg-white font-bold">
+                    </div>
+                    <textarea id="gbComment" rows="2" placeholder="전시 소감이나 1988년 사원으로서의 한마디를 남겨주세요!" required class="w-full border-2 border-vintageDark p-2 text-xs rounded bg-white font-bold"></textarea>
+                    <button type="submit" class="bg-vintageGreen hover:bg-green-900 text-white text-xs font-bold px-4 py-2 rounded shadow transition">
+                        방명록 작성하기
+                    </button>
+                </form>
+
+                <!-- Entries List -->
+                <div class="border-t-2 border-vintageDark pt-4 space-y-3 max-h-60 overflow-y-auto" id="guestbookList">
+                    <!-- Default Initial Entry -->
+                    <div class="bg-amber-100 p-3 rounded border border-amber-300 text-xs space-y-1">
+                        <div class="flex justify-between font-bold text-vintageDark">
+                            <span>이철수 (기획실)</span>
+                            <span class="text-stone-500 font-pixel">1988.10.18</span>
+                        </div>
+                        <p class="text-stone-700">그 시절 반월공단의 뜨거운 열기를 다시 느낍니다. 미션 성공하고 가요!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-vintageDark text-vintageBg py-8 border-t-4 border-amber-800 text-xs">
+        <div class="max-w-6xl mx-auto px-4 text-center space-y-3">
+            <div class="flex justify-center space-x-4 font-bold text-amber-200">
+                <span>주최: 공간 파동</span>
+                <span>•</span>
+                <span>후원: 안산문화재단</span>
+            </div>
+            <p class="text-stone-400">
+                2026 안산문화재단 문화자율 활성화 사업 [안산산업역사관 팝업전시: 1988 레트로 오피스]
+            </p>
+            <p class="text-stone-500 font-pixel">
+                EXHIBITION DATE: 2026.10.18 (SUN) | SPACE PADONG ARCHIVE
+            </p>
+        </div>
+    </footer>
+
+    <!-- Audio Element (Lo-fi Background Music Simulation) -->
+    <audio id="bgmAudio" loop>
+        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- JavaScript Interactions -->
+    <script>
+        // Zone Switcher Logic
+        function switchZone(zoneNum) {
+            document.querySelectorAll('.zone-panel').forEach(panel => panel.classList.add('hidden'));
+            document.querySelectorAll('.zone-tab').forEach(tab => {
+                tab.classList.remove('bg-amber-200');
+                tab.classList.add('bg-vintagePaper');
+            });
+
+            document.getElementById(`zone-content-${zoneNum}`).classList.remove('hidden');
+            document.getElementById(`tab-${zoneNum}`).classList.remove('bg-vintagePaper');
+            document.getElementById(`tab-${zoneNum}`).classList.add('bg-amber-200');
+        }
+
+        // Mission Answer Reveal
+        function revealMission(num) {
+            const ansBox = document.getElementById(`mission-ans-${num}`);
+            ansBox.classList.toggle('hidden');
+        }
+
+        // Generate Salary Slip
+        function generateSalarySlip() {
+            const nameInput = document.getElementById('employeeName').value.trim();
+            const slipName = document.getElementById('slipName');
+            if (nameInput) {
+                slipName.textContent = `${nameInput} 사원`;
+            } else {
+                slipName.textContent = `김안산 사원`;
+            }
+        }
+
+        // Copy Certificate Text
+        function copyCertificate() {
+            const name = document.getElementById('slipName').textContent;
+            const text = `[1988년 월분 급여명세서]\n성명: ${name}\n부서: 안산 기획실\n실수령액: 500,000원\n(주)반월공업단지 팝업전시 인증 완료!`;
+            
+            const tempInput = document.createElement('textarea');
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+
+            alert('월급명세서 클립보드 복사 완료!');
+        }
+
+        // Guestbook Local State
+        function addGuestbookEntry(e) {
+            e.preventDefault();
+            const name = document.getElementById('gbName').value.trim();
+            const dept = document.getElementById('gbDept').value.trim();
+            const comment = document.getElementById('gbComment').value.trim();
+
+            if (!name || !comment) return;
+
+            const list = document.getElementById('guestbookList');
+            const newEntry = document.createElement('div');
+            newEntry.className = 'bg-amber-100 p-3 rounded border border-amber-300 text-xs space-y-1 animate-fade-in';
+            newEntry.innerHTML = `
+                <div class="flex justify-between font-bold text-vintageDark">
+                    <span>${name} (${dept || '사원'})</span>
+                    <span class="text-stone-500 font-pixel">1988.10.18</span>
+                </div>
+                <p class="text-stone-700">${comment}</p>
+            `;
+
+            list.prepend(newEntry);
+            document.getElementById('guestbookForm').reset();
+        }
+
+        // Audio Player Toggle
+        let isPlaying = false;
+        function toggleAudio() {
+            const audio = document.getElementById('bgmAudio');
+            const playText = document.getElementById('playText');
+            const playIcon = document.getElementById('playIcon');
+            const tapeIcon = document.getElementById('tapeIcon');
+
+            if (!isPlaying) {
+                audio.play().catch(() => {});
+                playText.textContent = '정지';
+                playIcon.className = 'fa-solid fa-pause';
+                tapeIcon.classList.add('animate-spin');
+                isPlaying = true;
+            } else {
+                audio.pause();
+                playText.textContent = '재생';
+                playIcon.className = 'fa-solid fa-play';
+                tapeIcon.classList.remove('animate-spin');
+                isPlaying = false;
+            }
+        }
+
+        // CRT Screen Toggle
+        function toggleCRT() {
+            const crt = document.getElementById('crtOverlay');
+            crt.classList.toggle('hidden');
+        }
+    </script>
+</body>
+</html>
